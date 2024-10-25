@@ -1,17 +1,29 @@
 import type { Metadata } from "next";
-import {Ubuntu} from "next/font/google";
+import { Ubuntu } from "next/font/google";
 import "./globals.css";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from '@clerk/nextjs'
+import Navbar from "./components/Navbar";
+import ToasterContext from "@/context/ToasterContext";
 
 
-const ubuntu = Ubuntu({
+
+
+const ubuntu = Ubuntu({ 
   subsets: ["latin"] ,
-  weight:["300","400","500","700"]
-});
 
+  weight: ["300", "400", "500", "700"]
+
+ });
 
 export const metadata: Metadata = {
-  title: "my Kanban",
-  description: "personal Kanban app",
+  title: "My Kanban",
+  description: "Personal Kanban Board",
 };
 
 export default function RootLayout({
@@ -20,12 +32,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={ubuntu.className}
-      >
+    <ClerkProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${ubuntu.className}
+        bg-gray-900 text-white`}
+        suppressHydrationWarning
+        >
+        
+          <ToasterContext />
+        <Navbar />
         {children}
+        
       </body>
     </html>
+    </ClerkProvider>
   );
 }
