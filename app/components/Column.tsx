@@ -3,7 +3,7 @@ import { useState } from "react";
 import Modal from "./ui/Modal";
 import { deleteTask, editTask } from "@/app/actions/boardActions";
 import { Task } from "@/types/types";
-import { FaTrashAlt, FaEdit, FaPalette } from "react-icons/fa"; // Yeni ikon eklendi
+import { FaTrashAlt, FaEdit, FaPalette } from "react-icons/fa";
 
 interface ColumnProps {
   title: string;
@@ -11,23 +11,12 @@ interface ColumnProps {
   droppableId: string;
 }
 
-const Column: React.FC<ColumnProps> = ({
-  title,
-  tasks,
-  droppableId,
-}) => {
+const Column: React.FC<ColumnProps> = ({ title, tasks, droppableId }) => {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [taskId, setTaskId] = useState<string | null>(null);
   const [isEdit, setIsEdit] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
-
-  // Yeni task renkleri için state
-  const [taskColors, setTaskColors] = useState<{ [key: string]: string }>(
-    tasks.reduce((acc, task) => {
-      acc[task.id] = "bg-purple-900"; // Varsayılan renk
-      return acc;
-    }, {} as { [key: string]: string })
-  );
+  const [taskColors, setTaskColors] = useState<{ [key: string]: string }>({});
 
   const openDeleteModal = (taskId: string) => {
     setIsDelete(true);
@@ -49,37 +38,40 @@ const Column: React.FC<ColumnProps> = ({
     setTaskId(null);
   };
 
-  // Renk değiştirme fonksiyonu
-  const changeTaskColor = (taskId: string) => {
+  const toggleTaskColor = (taskId: string) => {
+    const currentColor = taskColors[taskId];
+    const nextColor =
+      currentColor === "bg-purple-900" ? "bg-blue-500" :
+      currentColor === "bg-blue-500" ? "bg-pink-500" :
+      currentColor === "bg-pink-500" ? "bg-red-500" :
+      currentColor === "bg-red-500" ? "bg-green-500" :
+      "bg-purple-900"; // Default to purple if no color is set
+
     setTaskColors((prevColors) => ({
       ...prevColors,
-      [taskId]: prevColors[taskId] === "bg-purple-900" ? "bg-blue-600" : "bg-purple-900", // Yeni renk seçimi
+      [taskId]: nextColor,
     }));
   };
 
   return (
     <div className="flex-1 dark:bg-gray-800 bg-gray-200 rounded-lg p-4">
       <div className="flex gap-1 dark:text-white">
-        <h2 className="font-extrabold mb-4 uppercase">
-          {title}
-        </h2>
+      
+      
+        <h2 className="font-extrabold mb-4 uppercase">{title}</h2>
+        
       </div>
 
       <Droppable droppableId={droppableId}>
         {(provided) => (
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
+          <div {...provided.droppableProps} ref={provided.innerRef}>
             {tasks.map((task, index) => (
-              <Draggable
-                key={task.id}
-                draggableId={task.id}
-                index={index}
-              >
+              <Draggable key={task.id} draggableId={task.id} index={index}>
                 {(provided) => (
                   <div
-                    className={`${taskColors[task.id]} rounded p-2 mb-2 text-white flex justify-between`}
+                    className={`rounded p-2 mb-2 text-white flex justify-between ${
+                      taskColors[task.id] || "bg-purple-900"
+                    }`}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
@@ -99,7 +91,7 @@ const Column: React.FC<ColumnProps> = ({
                         />
                         <FaPalette
                           className="text-xs text-gray-400 mt-1 cursor-pointer"
-                          onClick={() => changeTaskColor(task.id)}
+                          onClick={() => toggleTaskColor(task.id)}
                         />
                       </div>
                     )}
@@ -111,6 +103,7 @@ const Column: React.FC<ColumnProps> = ({
           </div>
         )}
       </Droppable>
+
       {isEdit && (
         <Modal
           closeModal={closeEditModal}
@@ -120,6 +113,7 @@ const Column: React.FC<ColumnProps> = ({
           title="Edit Task"
         />
       )}
+
       {isDelete && (
         <Modal
           closeModal={closeDeleteModal}

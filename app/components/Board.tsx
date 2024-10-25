@@ -99,12 +99,15 @@ const Board:React.FC<{board: BoardTypes | null}> = ({
   }
 
   return (
-    <div className="bg-black py -10 relative
+    <div className="bg-black py -8 relative
     h-screen">
-      <h1 className="font-extrabold text-center mb-10
-      text-3xl">
+      <h1 className="font-extrabold text-left m-6
+      text-4xl pl-10 ">
         {board!.name}
+      
       </h1>
+      <p className="font-thin pl-10 text-start underline mb-5" >by Ahmet T. Visit website</p>
+      
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid md:grid-cols-4
         max-md:items-center w-[90%] max-w-[1500px]
