@@ -70,8 +70,8 @@ const Board:React.FC<{board: BoardTypes | null}> = ({
       try {
         axios.post("/api/updateTaskStatus", {
           taskId: draggableId,
-          newStatus: updatedStatus
-        })
+          newStatus: updatedStatus,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -101,7 +101,7 @@ const Board:React.FC<{board: BoardTypes | null}> = ({
   return (
     <div className="bg-black py -10 relative
     h-screen">
-      <h1 className="font-bold text-center mb-10
+      <h1 className="font-extrabold text-center mb-10
       text-3xl">
         {board!.name}
       </h1>

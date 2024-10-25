@@ -25,7 +25,7 @@ const Navbar = () => {
         </Link>
            <div className="flex items-center gap-5">
            <UserButton afterSignOutUrl="/" />
-            <span>THEME SWİTCH</span>
+            <span></span>
            </div>
            {
             !isSignedIn && (

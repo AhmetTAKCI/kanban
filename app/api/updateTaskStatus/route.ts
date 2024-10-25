@@ -1,26 +1,15 @@
-import { prisma } from "@/utils/prisma"
-import { NextApiRequest, NextApiResponse } from "next"
+import { prisma } from "@/utils/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === "POST") {
-    const { taskId, newStatus, boardId } = req.body;
+export async function POST(req: NextRequest) {
+    const body = await req.json()
+    const {taskId, newStatus} = body;
 
-    if (!taskId || !newStatus || !boardId) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
+    const updatedTask = await prisma.task.update({
+        where: {id: taskId},
+        data: {status: newStatus}
+    })
 
-    try {
-      await prisma.task.update({
-        where: { id: taskId },
-        data: { status: newStatus, boardId: boardId },
-      });
-
-      res.status(200).json({ message: "Task updated successfully" });
-    } catch (error) {
-      console.error("Error updating task:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
-  }
+    return NextResponse.json({updatedTask});
+    
 }

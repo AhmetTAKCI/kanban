@@ -3,7 +3,7 @@ import { useState } from "react";
 import Modal from "./ui/Modal";
 import { deleteTask, editTask } from "@/app/actions/boardActions";
 import { Task } from "@/types/types";
-import { FaTrashAlt, FaEdit } from "react-icons/fa"; // İkonları ekleyin
+import { FaTrashAlt, FaEdit, FaPalette } from "react-icons/fa"; // Yeni ikon eklendi
 
 interface ColumnProps {
   title: string;
@@ -20,6 +20,14 @@ const Column: React.FC<ColumnProps> = ({
   const [taskId, setTaskId] = useState<string | null>(null);
   const [isEdit, setIsEdit] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
+
+  // Yeni task renkleri için state
+  const [taskColors, setTaskColors] = useState<{ [key: string]: string }>(
+    tasks.reduce((acc, task) => {
+      acc[task.id] = "bg-purple-900"; // Varsayılan renk
+      return acc;
+    }, {} as { [key: string]: string })
+  );
 
   const openDeleteModal = (taskId: string) => {
     setIsDelete(true);
@@ -41,10 +49,18 @@ const Column: React.FC<ColumnProps> = ({
     setTaskId(null);
   };
 
+  // Renk değiştirme fonksiyonu
+  const changeTaskColor = (taskId: string) => {
+    setTaskColors((prevColors) => ({
+      ...prevColors,
+      [taskId]: prevColors[taskId] === "bg-purple-900" ? "bg-blue-600" : "bg-purple-900", // Yeni renk seçimi
+    }));
+  };
+
   return (
-    <div className="flex-1">
+    <div className="flex-1 dark:bg-gray-800 bg-gray-200 rounded-lg p-4">
       <div className="flex gap-1 dark:text-white">
-        <h2 className="text-sm font-semibold mb-4 uppercase">
+        <h2 className="font-extrabold mb-4 uppercase">
           {title}
         </h2>
       </div>
@@ -54,7 +70,6 @@ const Column: React.FC<ColumnProps> = ({
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="dark:bg-gray-800 bg-gray-200 rounded-lg p-4"
           >
             {tasks.map((task, index) => (
               <Draggable
@@ -64,7 +79,7 @@ const Column: React.FC<ColumnProps> = ({
               >
                 {(provided) => (
                   <div
-                    className="bg-purple-900 rounded p-2 mb-2 text-white flex justify-between"
+                    className={`${taskColors[task.id]} rounded p-2 mb-2 text-white flex justify-between`}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
@@ -81,6 +96,10 @@ const Column: React.FC<ColumnProps> = ({
                         <FaTrashAlt
                           className="text-xs text-gray-400 mt-1 cursor-pointer"
                           onClick={() => openDeleteModal(task.id)}
+                        />
+                        <FaPalette
+                          className="text-xs text-gray-400 mt-1 cursor-pointer"
+                          onClick={() => changeTaskColor(task.id)}
                         />
                       </div>
                     )}
@@ -101,7 +120,6 @@ const Column: React.FC<ColumnProps> = ({
           title="Edit Task"
         />
       )}
-
       {isDelete && (
         <Modal
           closeModal={closeDeleteModal}
